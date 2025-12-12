@@ -1,0 +1,31 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>uppgift-1-naruebet-singsathon</title>
+    
+  </head>
+  <body>
+  <div class="app">
+    <h1>Hacker News</h1>
+    <form id="search-form">
+      <input id="query" placeholder="Sök..." />
+      <select id="sort">
+        <option value="relevance">Relevance</option>
+        <option value="points">Points</option>
+        <option value="time">Time</option>
+      </select>
+      <button type="submit">Sök</button>
+    </form>
+    <div class="pager">
+      <button id="prev">Previous</button>
+      <span id="page-label"></span>
+      <button id="next">Next</button>
+    </div>
+      <div id="status"></div>
+      <ul id="news"></ul>
+  </div>
+    <script type="module" src="/src/main.ts"></script>
+  </body>
+</html>
