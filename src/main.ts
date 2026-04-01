@@ -11,7 +11,7 @@ import type { HNHit, SortMode } from "./services/HackerAPI.types";
  */
 
 const listEl = document.querySelector<HTMLUListElement>("#news")!;
-const SearchformEl = document.querySelector<HTMLFormElement>("#search-form")!;
+const searchFormEl = document.querySelector<HTMLFormElement>("#search-form")!;
 const queryEl = document.querySelector<HTMLInputElement>("#query")!;
 const sortEl = document.querySelector<HTMLSelectElement>("#sort")!;
 const prevBtn = document.querySelector<HTMLButtonElement>("#prev")!;
@@ -28,13 +28,24 @@ let hits: HNHit[] = [];
  */
 let query = "";
 let page = 0;
-let sort: SortMode = "relevance";
+let sort: SortMode = "time";
 let nbPages = 0;
+
+// Helper function to prevent XSS (Cross-Site Scripting)
+const escapeHtml = (unsafeText: string) => {
+  return unsafeText
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;")
+    .replace(/'/g, "&#039;");
+}
 
 // Error handler
 const handleError = (err: unknown) => {
 	if (err instanceof AxiosError) {
-		alert("Network error, response code was: " + err.status);
+		// Axios status is usually inside err.response
+		alert("Network error, response code was: " + err.response?.status);
 		console.log("Network Error thrown:", err);
 
 	} else if (err instanceof Error) {
@@ -42,7 +53,7 @@ const handleError = (err: unknown) => {
 		console.log(err);
 
 	} else {
-		alert("Something unexpected happend. Please try not to break stuff.");
+		alert("Something unexpected happened. Please try not to break stuff.");
 		console.log("Unexpected error:", err);
 	}
 }
@@ -87,14 +98,16 @@ const getNewsAndRender = async() => {
 }
 
 const renderNews = () => {
-
+  let displayHits = hits;
+  
+  // Create a copy [...hits] to avoid mutating the original state array
   if (sort === "points") {
-    hits.sort((a, b) => (b.points ?? 0) - (a.points ?? 0));
+    displayHits = [...hits].sort((a, b) => (b.points ?? 0) - (a.points ?? 0));
   } else if (sort === "time") {
-    hits.sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime());
+    displayHits = [...hits].sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime());
   }
 
-  listEl.innerHTML = hits
+  listEl.innerHTML = displayHits
     .map(hit => {
       const title = hit.title ?? hit.story_title ?? "(no title)";
       const url = hit.url || hit.story_url;
@@ -102,20 +115,27 @@ const renderNews = () => {
       const time = new Date(hit.created_at).toLocaleString();
 
       return `<li class="news-item">
-        <a class="news-title" href="${url}" target="_blank" rel="noreferrer">${title}</a>
-        <div class="news-meta">
-          ⭐ ${points} | 🕒 ${time} | 👤 ${hit.author}
-        </div>
+        <article>
+          <a class="news-title" href="${url}" target="_blank" rel="noopener noreferrer">
+            <h2>${escapeHtml(title)}</h2>
+          </a>
+          <div class="news-meta">
+            <span class="meta-item">⭐ ${points} poäng</span>
+            <span class="meta-item">🕒 ${time}</span>
+            <span class="meta-item">👤 ${escapeHtml(hit.author)}</span>
+          </div>
+        </article>
       </li>`;
     })
     .join("");
-    // Pager UI
+  
+  // Pager UI
   prevBtn.disabled = page <= 0;
   nextBtn.disabled = page >= nbPages - 1;
-  pageLabel.textContent = `Sida ${page + 1} / ${nbPages}`;
+  pageLabel.textContent = `Page ${page + 1} / ${nbPages}`;
 }
 
-SearchformEl.addEventListener("submit", (e) => {
+searchFormEl.addEventListener("submit", (e) => {
   e.preventDefault();
   query = queryEl.value.trim();
   sort = sortEl.value as SortMode;

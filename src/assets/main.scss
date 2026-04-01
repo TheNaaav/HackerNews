@@ -1,118 +1,196 @@
+/* --- Variabler för enkel färgstyrning --- */
+:root {
+  --bg-dark: #05070a;           /* Djup mörk bakgrund */
+  --card-bg: rgba(13, 17, 23, 0.95); /* Kort-bakgrund med lite transparens */
+  --neon-cyan: #00f2ff;         /* Huvudfärg (Neon) */
+  --neon-glow: rgba(0, 242, 255, 0.3);
+  --text-main: #e6edf3;         /* Off-white för bästa läsbarhet */
+  --text-muted: #8b949e;        /* Grå text för meta-info */
+  --border-color: #30363d;      /* Subtila linjer */
+  --font-mono: 'Courier New', monospace;
+  --font-sans: system-ui, -apple-system, sans-serif;
+}
+
+/* --- Grundinställningar & Bakgrundseffekter --- */
 body {
   margin: 0;
-  font-family: system-ui, -apple-system, BlinkMacSystemFont, Arial, sans-serif;
-  background: linear-gradient(180deg, #f3d28c 0%, #f8e4b3 100%);
-  color: #2b2b2b;
+  padding: 0;
+  font-family: var(--font-sans);
+  background-color: var(--bg-dark);
+  color: var(--text-main);
+  line-height: 1.6;
+  min-height: 100vh;
+  
+  /* Digitalt rutnät i bakgrunden */
+  background-image: 
+    linear-gradient(rgba(0, 242, 255, 0.03) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(0, 242, 255, 0.03) 1px, transparent 1px);
+  background-size: 40px 40px;
+  background-attachment: fixed;
 }
 
+/* Scanlines-effekt (tunn horisontell textur över hela skärmen) */
+body::before {
+  content: "";
+  position: fixed;
+  top: 0; left: 0; width: 100%; height: 100%;
+  background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.1) 50%);
+  background-size: 100% 4px;
+  z-index: 100; /* Ligger överst men pointer-events: none gör den klickbar igenom */
+  pointer-events: none;
+  opacity: 0.3;
+}
+
+/* --- Huvudcontainern --- */
 .app {
   max-width: 900px;
-  margin: 40px auto;
-  padding: 24px;
-  background-color: #ffffff;
-  border-radius: 14px;
-  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
+  margin: 60px auto;
+  padding: 32px;
+  background-color: var(--card-bg);
+  border: 1px solid var(--border-color);
+  border-top: 4px solid var(--neon-cyan); /* Cyber-accent */
+  border-radius: 4px;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.8), 0 0 20px rgba(0, 242, 255, 0.1);
+  position: relative;
+  z-index: 101; /* Hamnar över scanlines */
 }
 
-/* Header / title */
+/* --- Header --- */
 h1 {
-  margin-top: 0;
-  margin-bottom: 16px;
-  font-size: 28px;
+  font-family: var(--font-mono);
   text-align: center;
+  color: var(--neon-cyan);
+  text-transform: uppercase;
+  letter-spacing: 5px;
+  margin-bottom: 40px;
+  text-shadow: 0 0 10px var(--neon-glow);
 }
 
-/* Search + sort */
+/* --- Sök och Filter --- */
 #search-form {
   display: flex;
-  gap: 10px;
-  margin-bottom: 20px;
-
-  input,
-  select,
-  button {
-    padding: 10px 12px;
-    border-radius: 10px;
-    border: 1px solid #ddd;
-    font-size: 14px;
-  }
-
-  input {
-    flex: 1;
-  }
-
-  button {
-    background-color: #f3d28c;
-    border: none;
-    font-weight: 600;
-    cursor: pointer;
-
-    &:hover {
-      background-color: #eac06a;
-    }
-  }
+  flex-wrap: wrap;
+  gap: 12px;
+  margin-bottom: 40px;
 }
 
-/* Status text */
-#status {
-  margin-bottom: 12px;
-  font-style: italic;
-  opacity: 0.8;
+#search-form input, 
+#search-form select {
+  background: #0d1117;
+  color: #fff;
+  border: 1px solid var(--border-color);
+  padding: 12px 16px;
+  border-radius: 4px;
+  flex: 1;
+  min-width: 150px;
+  font-size: 1rem;
 }
 
-/* News list */
+#search-form input:focus {
+  outline: 2px solid var(--neon-cyan);
+  border-color: var(--neon-cyan);
+  box-shadow: 0 0 10px var(--neon-glow);
+}
+
+#search-form button {
+  background-color: var(--neon-cyan);
+  color: #000;
+  border: none;
+  padding: 12px 28px;
+  border-radius: 4px;
+  font-weight: 800;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+#search-form button:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 0 20px var(--neon-cyan);
+}
+
+/* --- Nyhetslistan --- */
 #news {
   list-style: none;
   padding: 0;
-  margin: 0;
 }
 
 .news-item {
-  padding: 14px;
-  border-radius: 12px;
-  border: 1px solid #eee;
-  margin-bottom: 12px;
-  transition: background 0.2s ease, transform 0.1s ease;
+  padding: 24px;
+  border-bottom: 1px solid var(--border-color);
+  transition: background 0.3s ease;
+}
 
-  &:hover {
-    background-color: #fafafa;
-    transform: translateY(-1px);
-  }
+.news-item:hover {
+  background: rgba(0, 242, 255, 0.02);
 }
 
 .news-title {
-  font-size: 16px;
-  font-weight: 700;
-  color: #1a1a1a;
+  font-size: 1.3rem;
+  color: var(--neon-cyan);
   text-decoration: none;
+  font-weight: 600;
+  display: block;
+  margin-bottom: 10px;
+}
 
-  &:hover {
-    text-decoration: underline;
-  }
+.news-title:hover, 
+.news-title:focus {
+  color: #fff;
+  text-decoration: underline;
+  outline: none;
 }
 
 .news-meta {
-  margin-top: 6px;
-  font-size: 13px;
-  opacity: 0.75;
+  font-family: var(--font-mono);
+  font-size: 0.85rem;
+  color: var(--text-muted);
+  display: flex;
+  flex-wrap: wrap;
+  gap: 20px;
 }
 
-/* Pager */
-#prev,
-#next {
-  padding: 8px 14px;
-  border-radius: 10px;
-  border: 1px solid #ddd;
-  background-color: #fff;
+/* --- Paginering --- */
+.pagination-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin-top: 40px;
+  gap: 20px;
+}
+
+#prev, #next {
+  background: transparent;
+  color: var(--text-main);
+  border: 1px solid var(--border-color);
+  padding: 10px 20px;
+  border-radius: 4px;
   cursor: pointer;
-
-  &:disabled {
-    opacity: 0.4;
-    cursor: not-allowed;
-  }
+  font-family: var(--font-mono);
+  transition: 0.2s;
 }
 
-#page-label {
-  margin: 0 10px;
-  font-weight: 600;
+#prev:hover:not(:disabled), 
+#next:hover:not(:disabled) {
+  border-color: var(--neon-cyan);
+  color: var(--neon-cyan);
+  box-shadow: 0 0 10px var(--neon-glow);
+}
+
+#prev:disabled, 
+#next:disabled {
+  opacity: 0.3;
+  cursor: not-allowed;
+}
+
+/* --- Responsivitet --- */
+@media (max-width: 600px) {
+  .app {
+    margin: 10px;
+    padding: 16px;
+  }
+  
+  #search-form {
+    flex-direction: column;
+  }
 }
